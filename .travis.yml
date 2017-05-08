@@ -1,8 +1,8 @@
 language: node_js
 node_js: '7'
-cache: yarn
+cache: npm
 install:
-- yarn install
+- npm install
 deploy:
   provider: heroku
   api_key:
