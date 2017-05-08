@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "supervisor ./bin/www"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
@@ -13,6 +13,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.8.1",
     "pg": "^6.1.5",
-    "serve-favicon": "~2.4.2"
+    "serve-favicon": "~2.4.2",
+    "supervisor": "^0.12.0"
   }
 }
