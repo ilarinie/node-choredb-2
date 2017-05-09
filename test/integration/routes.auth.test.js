@@ -56,7 +56,7 @@ describe('routes : auth', () => {
                     res.type.should.eql('application/json');
                     res.body.message.should.eql('Succesfully authenticated.');
                     done();
-                })
+                });
         });
         it('should not login an unregistered user', (done) => {
             chai.request(server)
@@ -71,60 +71,62 @@ describe('routes : auth', () => {
                     res.status.should.eql(401);
                     res.type.should.eql('application/json');
                     done();
-                })
-        })
+                });
+        });
     });
     describe('GET /auth/validate_token', () => {
-      it('should return true with  valid token', (done) => {
-        var token = "";
+        it('should return true with  valid token', (done) => {
+            var token = "";
 
-        chai.request(server)
-            .post('/auth/login')
-            .send({
-              username: 'testUser',
-              password: 'testPassword'
-            })
-            .end((err, res) => {
-              should.not.exist(err);
-              token = res.body.token;
-              testToken();
-            });
-        function testToken(){
-          chai.request(server)
-              .get('/auth/validate_token')
-              .set('Authorization', "JWT " + token)
-              .end((err, res) => {
-                should.not.exist(err);
-                res.body.status.should.eql('Token valid.');
-                res.status.should.eql(200);
-                res.redirects.length.should.eql(0);
-                done();
-              })
-        }
-      });
-      it('should return false with invalid token', (done) => {
-        var token = "wrongtoken";
-        chai.request(server)
-            .post('/auth/login')
-            .send({
-              username: 'testUser',
-              password: 'testPassword'
-            })
-            .end((err, res) => {
-              should.not.exist(err);
-              testToken();
-            });
-        function testToken(){
-          chai.request(server)
-              .get('/auth/validate_token')
-              .set('Authorization', "JWT " + token)
-              .end((err, res) => {
-                should.exist(err);
-                err.status.should.eql(401);
-                done();
-              })
-        }
+            chai.request(server)
+                .post('/auth/login')
+                .send({
+                    username: 'testUser',
+                    password: 'testPassword'
+                })
+                .end((err, res) => {
+                    should.not.exist(err);
+                    token = res.body.token;
+                    testToken();
+                });
 
-      })
+            function testToken() {
+                chai.request(server)
+                    .get('/auth/validate_token')
+                    .set('Authorization', "JWT " + token)
+                    .end((err, res) => {
+                        should.not.exist(err);
+                        res.body.status.should.eql('Token valid.');
+                        res.status.should.eql(200);
+                        res.redirects.length.should.eql(0);
+                        done();
+                    });
+            }
+        });
+        it('should return false with invalid token', (done) => {
+            var token = "wrongtoken";
+            chai.request(server)
+                .post('/auth/login')
+                .send({
+                    username: 'testUser',
+                    password: 'testPassword'
+                })
+                .end((err, res) => {
+                    should.not.exist(err);
+                    testToken();
+                });
+
+            function testToken() {
+                chai.request(server)
+                    .get('/auth/validate_token')
+                    .set('Authorization', "JWT " + token)
+                    .end((err, res) => {
+                        should.exist(err);
+                        err.status.should.eql(401);
+                        done();
+                    });
+            }
+
+        });
     });
 });

@@ -4,7 +4,7 @@ const knex = require('../db/connection');
 const jwt = require('jsonwebtoken');
 
 const authHelpers = require('../auth/_helpers');
-const passport = require('../auth/local');
+const passport = require('../auth/jwt');
 
 router.post('/register', (req, res, next) => {
     return authHelpers.createUser(req, res)
@@ -18,19 +18,17 @@ router.post('/register', (req, res, next) => {
 
 router.post('/login', (req, res) => {
     if (req.body.username && req.body.password) {
-        var username = req.body.username;
-        var password = req.body.password;
-    }
-    if (res, username, password) {
-      authHelpers.authenticate(res, username, password);
+        authHelpers.authenticate(res, req.body.username, req.body.password);
     } else {
-      handleResponse(res, 401, "You must provide valid credentials.");
+        handleResponse(res, 401, "You must provide valid credentials.");
     }
 
 });
 
-router.get('/validate_token', passport.authenticate('jwt', {session: false}), function(req, res){
-  handleResponse(res, 200, "Token valid.");
+router.get('/validate_token', passport.authenticate('jwt', {
+    session: false
+}), function(req, res) {
+    handleResponse(res, 200, "Token valid.");
 });
 
 

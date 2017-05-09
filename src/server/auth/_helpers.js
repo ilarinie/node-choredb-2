@@ -27,7 +27,7 @@ function authenticate(res, username, password) {
       id: user.id,
       expiry: Math.floor(new Date().getTime() + globals.JTW_TOKEN_TTL_HOURS * 60 * 60 * 1000)//7*24*60*60;
     };
-    var token = jwt.sign(payload, 'tasmanianDevil');
+    var token = jwt.sign(payload, process.env.SECRET_KEY);
     res.status(200).json( { message: "Succesfully authenticated.", token: token});
   });
 }

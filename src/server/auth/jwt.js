@@ -1,5 +1,4 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 var passportJWT = require("passport-jwt");
 const authHelpers = require('./_helpers');
 
@@ -13,7 +12,7 @@ init();
 
 var jwtOptions = {};
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
-jwtOptions.secretOrKey = 'tasmanianDevil';
+jwtOptions.secretOrKey = process.env.SECRET_KEY;
 
 
 passport.use(new JwtStrategy(jwtOptions, (jwt_payload, next) => {
