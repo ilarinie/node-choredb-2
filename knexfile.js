@@ -1,4 +1,4 @@
-const databaseName = 'choredb-dev';
+const databaseName = 'choredb';
 
 module.exports = {
   development: {
