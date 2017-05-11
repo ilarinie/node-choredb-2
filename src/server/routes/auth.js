@@ -28,6 +28,8 @@ router.post('/login', (req, res) => {
 router.get('/validate_token', passport.authenticate('jwt', {
     session: false
 }), function(req, res) {
+  //console.log(res);
+  console.log(req.user);
     handleResponse(res, 200, "Token valid.");
 });
 

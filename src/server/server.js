@@ -3,8 +3,10 @@
   'use strict';
 
   const app = require('./app');
+
   const debug = require('debug')('herman-express:server');
   const http = require('http');
+
 
   const port = normalizePort(process.env.PORT || '3000');
   app.set('port', port);

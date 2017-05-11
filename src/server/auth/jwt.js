@@ -16,13 +16,12 @@ jwtOptions.secretOrKey = process.env.SECRET_KEY;
 
 
 passport.use(new JwtStrategy(jwtOptions, (jwt_payload, next) => {
-
     // Check if JWT has expired
     if (new Date(jwt_payload.expiry) < new Date()){
       return next("Session expired.");
     }
     // check to see if the username exists
-    knex('users').where('id', jwt_payload.id).first()
+    knex('users').where('user_id', jwt_payload.id).first()
         .then((user) => {
             if (!user) {
                 return next(null, false);

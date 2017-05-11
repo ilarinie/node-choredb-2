@@ -24,7 +24,7 @@ function authenticate(res, username, password) {
       return;
     }
     var payload = {
-      id: user.id,
+      id: user.user_id,
       expiry: Math.floor(new Date().getTime() + globals.JTW_TOKEN_TTL_HOURS * 60 * 60 * 1000)//7*24*60*60;
     };
     var token = jwt.sign(payload, process.env.SECRET_KEY);
