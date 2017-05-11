@@ -34,7 +34,7 @@ router.get('/communes', passport.authenticate('jwt', {
     if (commune_id ) {
     knex('communes').where('commune_id', commune_id).first()
         .then((commune) => {
-          resJson = resJson + commune
+          resJson = resJson + commune;
           knex.raw('select chores.chore_id, chores.name, max(tasks.task_id) AS lastDone from chores right join tasks on tasks.chore_id = chores.chore_id where chores.commune_id = ' + commune_id + 'group by chores.name, chores.chore_id;')
               .then( (chores) => {
                   resJson = resJson + chores.rows;
@@ -51,16 +51,16 @@ router.post('/communes', passport.authenticate('jwt', {session: false}), functio
   if (user && req.body.commune_name) {
     knex('communes').insert({name: req.body.commune_name}).returning(['commune_id','name'])
         .then((asd) => {
-          console.log("commune created")
+          console.log("commune created");
           var commune_id = asd[0].commune_id;
           knex.raw('UPDATE users SET commune_id = '+commune_id+' WHERE user_id = ' + user.user_id+ ';')
               .then(() => {
                 res.status(200).json({message: "Created succesfully"});
-              })
+              });
         })
         .catch((err) => {
-          console.log(err)
-          console.log("error updates?")
+          console.log(err);
+          console.log("error updates?");
           res.status(406).json({message: err});
         });
   }
@@ -80,16 +80,16 @@ router.post('/chores/:id/do', passport.authenticate('jwt', { session: false } ),
                 chore_id: chore_id
               }).then((task) => {
                 res.status(200).json({ lastDone: task.created_at});
-              })
+              });
             }else {
               res.status(401).json();
             }
-          })
+          });
     } else {
       console.log("Request without a chore id");
       res.status(403).json();
     }
 
-})
+});
 
 module.exports = router;
