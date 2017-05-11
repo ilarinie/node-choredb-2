@@ -28,17 +28,17 @@ router.get('/communes', passport.authenticate('jwt', {
 }), function (req, res, next) {
     var commune_id = req.user.commune_id;
 
-    var resJson = {};
-    resJson.user = req.user;
+    var resJson = "";
+    resJson = resJson + req.user;
 
     if (commune_id ) {
     knex('communes').where('commune_id', commune_id).first()
         .then((commune) => {
-          resJson.commune = commune;
+          resJson = resJson + commune
           knex.raw('select chores.chore_id, chores.name, max(tasks.task_id) AS lastDone from chores right join tasks on tasks.chore_id = chores.chore_id where chores.commune_id = ' + commune_id + 'group by chores.name, chores.chore_id;')
               .then( (chores) => {
-                  resJson.chores = chores.rows;
-                  res.status(200).json(resJson);
+                  resJson = resJson + chores.rows;
+                  res.status(200).json(JSON.stringify(resJson));
           });
     });
   } else {
@@ -48,9 +48,7 @@ router.get('/communes', passport.authenticate('jwt', {
 
 router.post('/communes', passport.authenticate('jwt', {session: false}), function (req, res, next) {
   var user = req.user;
-  console.log(req)
   if (user && req.body.commune_name) {
-    console.log("vielä")
     knex('communes').insert({name: req.body.commune_name}).returning(['commune_id','name'])
         .then((asd) => {
           console.log("commune created")
