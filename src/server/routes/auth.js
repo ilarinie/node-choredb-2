@@ -17,6 +17,7 @@ router.post('/register', (req, res, next) => {
 });
 
 router.post('/login', (req, res) => {
+    console.log(req.body);
     if (req.body.username && req.body.password) {
         authHelpers.authenticate(res, req.body.username, req.body.password);
     } else {
