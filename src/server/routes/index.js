@@ -38,7 +38,7 @@ router.get('/communes', passport.authenticate('jwt', {
           knex.raw('select chores.chore_id, chores.name, max(tasks.task_id) AS lastDone from chores right join tasks on tasks.chore_id = chores.chore_id where chores.commune_id = ' + commune_id + 'group by chores.name, chores.chore_id;')
               .then( (chores) => {
                   resJson = resJson + chores.rows;
-                  res.status(200).json(JSON.stringify(resJson));
+                  res.status(200).json(resJson);
           });
     });
   } else {
