@@ -28,16 +28,16 @@ router.get('/communes', passport.authenticate('jwt', {
 }), function (req, res, next) {
     var commune_id = req.user.commune_id;
 
-    var resJson = "";
-    resJson = resJson + req.user;
+    var resJson = {};
+    resJson.user = req.user;
 
     if (commune_id ) {
     knex('communes').where('commune_id', commune_id).first()
         .then((commune) => {
-          resJson = resJson + commune;
+          resJson.commune = commune;
           knex.raw('select chores.chore_id, chores.name, max(tasks.task_id) AS lastDone from chores right join tasks on tasks.chore_id = chores.chore_id where chores.commune_id = ' + commune_id + 'group by chores.name, chores.chore_id;')
               .then( (chores) => {
-                  resJson = resJson + chores.rows;
+                  resJson.chores = chores.rows;
                   res.status(200).json(resJson);
           });
     });
