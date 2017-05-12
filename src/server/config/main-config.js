@@ -24,7 +24,7 @@
 
   appConfig.init = function(app, express) {
 
-      app.use(cors());
+      
 
     // *** view engine *** //
     nunjucks.configure(viewFolders, {
@@ -53,7 +53,7 @@
 
     app.use(flash());
     app.use(express.static(path.join(__dirname, '..', '..', 'client')));
-
+    app.use(cors());
   };
 
 })(module.exports);
