@@ -25,7 +25,7 @@ router.post('/communes', passport.authenticate('jwt', {session: false}), functio
       if (!err) {
         this.handleResponse(res, 200, results);
       } else {
-        this.handleResponse(res, 406, err);
+        this.handleError(res, 406, err.toString());
       }
     })
 });
@@ -59,7 +59,7 @@ router.post('/chores', passport.authenticate('jwt', {session: false}), function(
     var admin = req.user.admin;
     if (admin) {
         if (req.body.name && req.body.points && req.body.priority) {
-            knex('chores').insert({name: req.body.name, points_awarded: req.body.points, priority_in_minutes: req.body.priority, creator_id: user_id, commune_id: commune_id}).then((asd) => {
+            knex('chores').insert({name: req.body.name, points: req.body.points, priority: req.body.priority, creator_id: user_id, commune_id: commune_id}).then((asd) => {
                 res.status(200).json({message: "Chore created succesfully."});
             }).catch((err) => {
                 console.log(err);
@@ -101,28 +101,32 @@ router.post('/communes/add_user', passport.authenticate('jwt', {session: false})
     if (user_id && commune_id && admin && user_name) {
         knex('users').where('username', user_name).first().then((user) => {
             if (!user) {
-                res.status(406).json({message: "Username was not found"});
+                this.handleError(res, 406, "Username was not found");
             } else {
                 if (user.commune_id) {
-                    res.status(406).json({message: "User already belongs to a commune."});
+                  this.handleError(res, 406, "User already belongs to a commune.");
                 } else {
                     knex.raw("UPDATE users SET commune_id=" + commune_id + " WHERE user_id=" + user.user_id + ";").then((result) => {
                         if (result.rowCount === 1) {
-                            res.status(200).json({message: "User added succesfully."});
+                            this.handleResponse(res, 200, {message: "User added succesfully."});
                         } else {
-                            res.status(406).json({message: "Something went wrong adding the user."});
+                          this.handleError(res, 406, "Something went wrong adding the user.");
                         }
                     });
                 }
             }
         });
     } else {
-        res.status(406).json({message: "Unacceptable request."});
+        this.handleError(res, 406, "Unacceptable request.");
     }
 });
 
 handleResponse = (response, statusCode, message) => {
     response.status(statusCode).json(message);
+}
+
+handleError = (response, statusCode, message) => {
+  response.status(statusCode).json({ message: message.toString() });
 }
 
 module.exports = router;

@@ -5,10 +5,16 @@ function findCommune(commune_id) {
 }
 
 function findCommuneChores(commune_id) {
-    return knex.raw('select chores.chore_id, chores.name, max(tasks.created_at) AS lastDone from chores left join tasks on tasks.chore_id = chores.chore_id where chores.commune_id = ' + commune_id + 'group by chores.name, chores.chore_id;').then((chores) => {
-        return chores.rows;
-    })
-
+    return knex.raw('SELECT DISTINCT ON (foo.chore_id) foo.username AS lastdoer, max(foo.max) AS lastdone, foo.priority, foo.points, foo.chore_id, foo.name AS chorename' +
+                    ' FROM ( SELECT users.username, max(tasks.created_at), chores.chore_id, chores.name, chores.priority, chores.points FROM communes'+
+                    ' LEFT JOIN chores on chores.commune_id = communes.commune_id' +
+                    ' LEFT JOIN tasks on chores.chore_id = tasks.chore_id' +
+                    ' LEFT JOIN users on users.user_id = tasks.user_id' +
+                    ' WHERE communes.commune_id = '+ commune_id +
+                    ' GROUP BY chores.chore_id, chores.name, users.username, chores.priority, chores.points ) foo' +
+                    ' GROUP BY foo.username, foo.chore_id, foo.name, foo.priority, foo.points;').then((chores) => {
+                      return chores.rows;
+                  });
 }
 
 function findCommunePurchases(commune_id) {
@@ -19,6 +25,7 @@ function findCommunePurchases(commune_id) {
         return sortAndParsePurchases(result.rows)
     });
 }
+
 
 function sortAndParsePurchases(purchases) {
     var sum_of_all = 0;

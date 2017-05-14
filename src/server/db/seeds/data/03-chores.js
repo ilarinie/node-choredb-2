@@ -45,8 +45,8 @@ exports.seed = (knex, Promise) => {
 function createCommune(knex, chore){
   return knex.table('chores').insert({
     name: chore.name,
-    priority_in_minutes: chore.priority,
-    points_awarded: chore.points,
+    priority: chore.priority,
+    points: chore.points,
     commune_id: chore.commune_id,
     creator_id: chore.creator_id
   });
