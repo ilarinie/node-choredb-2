@@ -24,14 +24,14 @@
 
   appConfig.init = function(app, express) {
 
-      
+
 
     // *** view engine *** //
-    nunjucks.configure(viewFolders, {
+    /*nunjucks.configure(viewFolders, {
       express: app,
       autoescape: true
     });
-    app.set('view engine', 'html');
+    app.set('view engine', 'html');*/
 
     // *** app middleware *** //
     if (process.env.NODE_ENV !== 'test') {
@@ -39,14 +39,14 @@
     }
 
     // // uncomment if using express-session
-    app.use(session({
-      secret: process.env.SECRET_KEY,
-      resave: false,
-      saveUninitialized: true
-    }));
+    //app.use(session({
+    //  secret: process.env.SECRET_KEY,
+    //  resave: false,
+    //  saveUninitialized: true
+    //}));
     app.use(passport.initialize());
-    app.use(passport.session());
-
+    //app.use(passport.session());
+    app.disable('etag');
     app.use(cookieParser());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));

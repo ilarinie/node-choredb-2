@@ -17,7 +17,6 @@ router.post('/register', (req, res, next) => {
 });
 
 router.post('/login', (req, res) => {
-    console.log(req.body);
     if (req.body.username && req.body.password) {
         authHelpers.authenticate(res, req.body.username, req.body.password);
     } else {
@@ -29,8 +28,6 @@ router.post('/login', (req, res) => {
 router.get('/validate_token', passport.authenticate('jwt', {
     session: false
 }), function(req, res) {
-  //console.log(res);
-  console.log(req.user);
     handleResponse(res, 200, "Token valid.");
 });
 
