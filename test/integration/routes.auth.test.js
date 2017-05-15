@@ -6,7 +6,7 @@ const chaiHttp = require('chai-http');
 const server = require('../../src/server/app');
 const knex = require('../../src/server/db/connection');
 var jscover = require('node-jscover');
-
+const tokens = require('../tokens');
 
 chai.use(chaiHttp);
 
@@ -131,4 +131,34 @@ describe('routes : auth', () => {
 
         });
     });
+
+    describe('POST /auth/change_password', () => {
+      it('should be able to change password and login with the new pass', (done) => {
+        chai.request(server)
+            .post('/auth/change_password')
+            .set('Authorization', tokens.commune_admin_token)
+            .send({
+              password: '1111'
+            })
+            .end((err, res) => {
+                should.not.exist(err);
+                logInWithNewPass();
+            });
+
+            function logInWithNewPass(){
+              chai.request(server)
+                  .post('/auth/login')
+                  .send({
+                    username: 'user_with_admin',
+                    password: '1111'
+                  })
+                  .end((err, res) => {
+                      should.not.exist(err);
+                      done();
+                  });
+            }
+      })
+
+    });
+
 });

@@ -31,6 +31,19 @@ router.get('/validate_token', passport.authenticate('jwt', {
     handleResponse(res, 200, "Token valid.");
 });
 
+router.post('/change_password', passport.authenticate('jwt', {session: false}), function(req, res) {
+  if (req.body.password || req.user) {
+    return authHelpers.changePassword(req, res, req.body.password)
+                .then((response) => {
+                  handleResponse(res, 200, "Password changed succesfully");
+                }).catch((err) => {
+                  handleError(res, 500, err.toString);
+                })
+  } else {
+    handleError(res, 406, "Bad Request");
+  }
+});
+
 function handleError(res, code, errorMsg) {
   res.status(code).json({
     message: errorMsg
