@@ -50,9 +50,19 @@ function createUser (req) {
   .returning('*');
 }
 
+function changePassword(req, res, password) {
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync(password, salt);
+
+  return knex('users').update({
+    password: hash
+  }).returning('*');
+}
+
 module.exports = {
   comparePass,
   loginRequired,
   authenticate,
+  changePassword,
   createUser
 };
