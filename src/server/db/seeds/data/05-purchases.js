@@ -1,6 +1,6 @@
 const faker = require('faker');
 
-function createPurchases(){
+/*function createPurchases(){
   var first = createpurchasesForFirstCommune();
   var rest = createOtherPurchases();
   return first.concat(rest);
@@ -24,20 +24,24 @@ function createOtherPurchases() {
         purchases.push(purchase);
     }
     return purchases;
-}
+} */
 
 function createpurchasesForFirstCommune(){
   var purchases = [];
-  var user_id = 1;
   for (var i = 0; i < 5; i++) {
-      for (var j = 0; j <= user_id; j++){
         var purchase = {};
         purchase.description = faker.commerce.productName();
         purchase.amount = 10;
-        purchase.user_id = user_id;
+        purchase.user_id = '7926eed6-5416-447a-9dc7-d01bc3875be5';
         purchases.push(purchase);
-      }
-      user_id++;
+  }
+
+  for ( var i = 0; i < 5; i++) {
+    var purchase = {};
+    purchase.description = faker.commerce.productName();
+    purchase.amount = 5;
+    purchase.user_id = 'd0f6c11a-826f-43ac-a309-e52d6c6e5271';
+    purchases.push(purchase);
   }
   return purchases;
 
@@ -47,7 +51,7 @@ function createpurchasesForFirstCommune(){
 exports.seed = (knex, Promise) => {
     return knex('purchases').del().then(() => {
         var purchasePromises = [];
-        purchases = createPurchases();
+        purchases = createpurchasesForFirstCommune();
         purchases.forEach(function(purchase) {
             purchasePromises.push(createCommune(knex, purchase));
         });

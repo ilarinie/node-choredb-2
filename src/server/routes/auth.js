@@ -12,7 +12,7 @@ router.post('/register', (req, res, next) => {
             handleResponse(res, 200, "User created, you can now log in");
         })
         .catch((err) => {
-            handleResponse(res, 500, err);
+            handleError(res, 500, err.toString);
         });
 });
 
@@ -20,7 +20,7 @@ router.post('/login', (req, res) => {
     if (req.body.username && req.body.password) {
         authHelpers.authenticate(res, req.body.username, req.body.password);
     } else {
-        handleResponse(res, 401, "You must provide valid credentials.");
+        handleError(res, 401, "You must provide valid credentials.");
     }
 
 });
@@ -31,11 +31,16 @@ router.get('/validate_token', passport.authenticate('jwt', {
     handleResponse(res, 200, "Token valid.");
 });
 
+function handleError(res, code, errorMsg) {
+  res.status(code).json({
+    message: errorMsg
+  });
+}
 
-
-function handleResponse(res, code, statusMsg) {
+function handleResponse(res, code, statusMsg, contents) {
     res.status(code).json({
-        status: statusMsg
+        message: statusMsg,
+        contents: JSON.stringify(contents)
     });
 }
 

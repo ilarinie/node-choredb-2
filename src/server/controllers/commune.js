@@ -85,7 +85,7 @@ function postCommune(user, name, callBack) {
   }
   knex('communes').insert({name: name}).returning(['commune_id', 'name']).then((asd) => {
       var commune_id = asd[0].commune_id;
-      knex.raw('UPDATE users SET commune_id = ' + commune_id + ', admin = true WHERE user_id = ' + user.user_id + ';').then(() => {
+      knex.raw('UPDATE users SET commune_id = ' + commune_id + ', admin = true WHERE user_id = \'' + user.user_id + '\';').then(() => {
           callBack(null, {message: "Commune created succesfully"});
       });
   }).catch((err) => {

@@ -7,7 +7,6 @@ const server = require('../../src/server/app');
 const knex = require('../../src/server/db/connection');
 var jscover = require('node-jscover');
 
-console.log(jscover.instrument('', 'routes.auth.test.js'));
 
 chai.use(chaiHttp);
 
@@ -38,7 +37,7 @@ describe('routes : auth', () => {
                     res.redirects.length.should.eql(0);
                     res.status.should.eql(200);
                     res.type.should.eql('application/json');
-                    res.body.status.should.eql('User created, you can now log in');
+                    res.body.message.should.eql('User created, you can now log in');
                     done();
                 });
         });
@@ -49,15 +48,15 @@ describe('routes : auth', () => {
             chai.request(server)
                 .post('/auth/login')
                 .send({
-                    username: 'testUser',
-                    password: 'testPassword'
+                    username: 'user_normal',
+                    password: '1234'
                 })
                 .end((err, res) => {
                     should.not.exist(err);
                     res.redirects.length.should.eql(0);
                     res.status.should.eql(200);
                     res.type.should.eql('application/json');
-                    res.body.message.should.eql('Succesfully authenticated.');
+                    res.body.message.should.eql('Succesfully authenticated');
                     done();
                 });
         });
@@ -84,12 +83,12 @@ describe('routes : auth', () => {
             chai.request(server)
                 .post('/auth/login')
                 .send({
-                    username: 'testUser',
-                    password: 'testPassword'
+                    username: 'user_normal',
+                    password: '1234'
                 })
                 .end((err, res) => {
                     should.not.exist(err);
-                    token = res.body.token;
+                    token = res.body.contents.token;
                     testToken();
                 });
 
@@ -99,7 +98,7 @@ describe('routes : auth', () => {
                     .set('Authorization', "JWT " + token)
                     .end((err, res) => {
                         should.not.exist(err);
-                        res.body.status.should.eql('Token valid.');
+                        res.body.message.should.eql('Token valid.');
                         res.status.should.eql(200);
                         res.redirects.length.should.eql(0);
                         done();
@@ -111,8 +110,8 @@ describe('routes : auth', () => {
             chai.request(server)
                 .post('/auth/login')
                 .send({
-                    username: 'testUser',
-                    password: 'testPassword'
+                    username: 'user_normal',
+                    password: '1234'
                 })
                 .end((err, res) => {
                     should.not.exist(err);

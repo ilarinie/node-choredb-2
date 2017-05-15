@@ -15,14 +15,9 @@ function createChores(){
       if (commune_id > 5){
         commune_id = 1;
       }
-      creator_id += 5;
-      if (creator_id > 20) {
-        creator_id = 1;
-      }
       change = 1;
     }
     chore.commune_id = commune_id;
-    chore.creator_id = creator_id;
     chores.push(chore);
     change++;
   }

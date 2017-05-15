@@ -3,16 +3,9 @@ const router = express.Router();
 const passport = require('../auth/jwt');
 const knex = require('../db/connection');
 
-const indexController = require('../controllers/index');
-const communeController = require('../controllers/commune');
-
 var responder = require('./responder');
 
-const jwt = require('jsonwebtoken');
-var passportJWT = require("passport-jwt");
-var ExtractJwt = passportJWT.ExtractJwt;
-
-router.post('/purchases', passport.authenticate('jwt', {session: false}), function(req, res) {
+router.post('/', passport.authenticate('jwt', {session: false}), function(req, res) {
     var user_id = req.user.user_id;
     var commune_id = req.user.commune_id;
     var description = req.body.description;
@@ -29,6 +22,25 @@ router.post('/purchases', passport.authenticate('jwt', {session: false}), functi
     } else {
         responder.handleError(res, 406, "Invalid purchase");
     }
+});
+
+router.delete('/:id', passport.authenticate('jwt', {session: false}), function(req, res) {
+  var user_id = req.user.user_id;
+  var purchase_id = parseInt(req.params.id);
+  if (user_id && purchase_id) {
+    knex('purchases').where('user_id', user_id).andWhere('purchase_id', purchase_id).first().del()
+      .then((result) => {
+        if (result === 1) {
+          responder.handleResponse(res, 200, "Purchase deleted succesfully.");
+        } else {
+          responder.handleError(res, 404, "Purchase not found.");
+        }
+      })
+  } else {
+    responder.handleError(res, 406, "Bad request");
+  }
+
+
 });
 
 

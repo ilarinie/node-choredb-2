@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const uuidV4 = require('uuid/v4');
 
 var names = [
     "testUser",
@@ -28,11 +29,26 @@ var names = [
     "test_user_5_5"
 ];
 
+function createSpecialUsers() {
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync('1234', salt);
+
+  var specialUsers = [];
+  var user_without_commune = { username: "user_without_commune", commune_id: null, password: hash, admin: false, user_id: '51f84155-11e5-4511-92a7-4a9f8f37344e'}
+  specialUsers.push(user_without_commune);
+
+  var user_with_admin = { username: "user_with_admin", commune_id: 1, password: hash, admin: true, user_id: '7926eed6-5416-447a-9dc7-d01bc3875be5'}
+specialUsers.push(user_with_admin);
+  var user_normal = { username: "user_normal", commune_id: 1, password: hash, admin: false, user_id: 'd0f6c11a-826f-43ac-a309-e52d6c6e5271'}
+specialUsers.push(user_normal);
+  return specialUsers;
+}
+
 function createUsers() {
     const salt = bcrypt.genSaltSync();
-    const hash = bcrypt.hashSync('testPassword', salt);
+    const hash = bcrypt.hashSync('1234', salt);
 
-
+    var uuid = uuidV4();
     var users = [];
     var commune_id = 1;
     var change = 1;
@@ -42,7 +58,7 @@ function createUsers() {
         change = 1;
       }
       var admin = change === 1;
-      users.push({username: names[i], commune_id: commune_id, password: hash, admin: admin });
+      users.push({username: names[i], commune_id: commune_id, password: hash, admin: admin, user_id: uuid });
       change++;
     }
     return users;
@@ -51,16 +67,21 @@ function createUsers() {
 exports.seed = (knex, Promise) => {
     return knex('users').del().then(() => {
         var userPromises = [];
+        var specialUsers = createSpecialUsers();
         var users = createUsers();
-        users.forEach(function(user) {
+        specialUsers.forEach(function(user) {
             userPromises.push(createUser(knex, user));
         });
+        /*users.forEach(function(user) {
+            userPromises.push(createUser(knex, user));
+        });*/
         return Promise.all(userPromises);
     });
 }
 
 function createUser(knex, user) {
     return knex.table('users').insert({
+      user_id: user.user_id,
       username: user.username,
       commune_id: user.commune_id,
       password: user.password,

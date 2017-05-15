@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const knex = require('../db/connection');
 const jwt = require('jsonwebtoken');
+const uuidV4 = require('uuid/v4');
 const globals = require('../globals');
 
 function comparePass(userPassword, databasePassword) {
@@ -16,11 +17,11 @@ function authenticate(res, username, password) {
   knex('users').where('username', username).first()
   .then((user) => {
     if (!user) {
-      res.status(401).json( {message: "Auth failure :("});
+      res.status(401).json( { message: "Auth failure :(" });
       return;
     }
     if (!comparePass(password, user.password)){
-      res.status(401).json( {message: "Auth2 failure "});
+      res.status(401).json( { message: "Auth2 failure " });
       return;
     }
     var payload = {
@@ -28,7 +29,10 @@ function authenticate(res, username, password) {
       expiry: Math.floor(new Date().getTime() + globals.JTW_TOKEN_TTL_HOURS * 60 * 60 * 1000)//7*24*60*60;
     };
     var token = jwt.sign(payload, process.env.SECRET_KEY);
-    res.status(200).json( { message: "Succesfully authenticated.", token: token});
+    responseJson = {};
+    responseJson.message = "Succesfully authenticated";
+    responseJson.contents = {token: token};
+    res.status(200).json( responseJson );
   });
 }
 
@@ -36,8 +40,10 @@ function authenticate(res, username, password) {
 function createUser (req) {
   const salt = bcrypt.genSaltSync();
   const hash = bcrypt.hashSync(req.body.password, salt);
+  const uuid = uuidV4();
   return knex('users')
   .insert({
+    user_id: uuid,
     username: req.body.username,
     password: hash
   })

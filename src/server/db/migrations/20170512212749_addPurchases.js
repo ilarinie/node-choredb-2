@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
       table.decimal('amount').notNullable();
       table.string('description').notNullable();
       table.integer('commune_id').unsigned().references('commune_id').inTable('communes').onDelete('CASCADE');
-      table.integer('user_id').unsigned().references('user_id').inTable('users').onDelete('CASCADE');
+      table.uuid('user_id').unsigned().references('user_id').inTable('users').onDelete('CASCADE');
   });
 };
 
