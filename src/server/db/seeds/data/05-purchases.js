@@ -33,6 +33,7 @@ function createpurchasesForFirstCommune(){
         purchase.description = faker.commerce.productName();
         purchase.amount = 10;
         purchase.user_id = '7926eed6-5416-447a-9dc7-d01bc3875be5';
+        purchase.commune_id = 1;
         purchases.push(purchase);
   }
 
@@ -41,6 +42,7 @@ function createpurchasesForFirstCommune(){
     purchase.description = faker.commerce.productName();
     purchase.amount = 5;
     purchase.user_id = 'd0f6c11a-826f-43ac-a309-e52d6c6e5271';
+    purchase.commune_id = 1;
     purchases.push(purchase);
   }
   return purchases;
@@ -63,6 +65,7 @@ function createCommune(knex, purchase) {
     return knex.table('purchases').insert({
       description: purchase.description,
       amount: purchase.amount,
+      commune_id: purchase.commune_id,
       user_id: purchase.user_id
     });
 }

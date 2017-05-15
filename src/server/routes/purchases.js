@@ -39,6 +39,21 @@ router.delete('/:id', passport.authenticate('jwt', {session: false}), function(r
   } else {
     responder.handleError(res, 406, "Bad request");
   }
+});
+
+router.get('/', passport.authenticate('jwt', {session: false}), function(req, res) {
+  var commune_id = parseInt(req.user.commune_id);
+  if ( commune_id ) {
+    knex('purchases').where('commune_id', commune_id)
+        .then((result) => {
+          console.log(typeof(result));
+          responder.handleResponse(res, 200, "List of purchases provided.", result)
+        }).catch((err) => {
+          responder.handleError(res, 500, "Database error");
+        })
+  } else {
+    responder.handleError(res, 406, "Bad Request.");
+  }
 
 
 });

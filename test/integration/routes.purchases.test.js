@@ -53,4 +53,23 @@ describe('routes : chores', () => {
           }
       });
   });
+
+  describe('GET /purchases', () => {
+    it('can get a list of purchases', (done) => {
+      chai.request(server)
+          .get('/purchases')
+          .set('Authorization', tokens.commune_admin_token)
+          .send()
+          .end((err, res) => {
+            should.not.exist(err);
+            res.body.message.should.equal("List of purchases provided.");
+            var purchases = JSON.parse(res.body.contents);
+            purchases.length.should.equal(10);
+            done();
+          })
+
+    })
+
+
+  });
 });
