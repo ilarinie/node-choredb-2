@@ -5,6 +5,9 @@ const should = chai.should();
 const chaiHttp = require('chai-http');
 const server = require('../../src/server/app');
 const knex = require('../../src/server/db/connection');
+var jscover = require('node-jscover');
+
+console.log(jscover.instrument('', 'routes.auth.test.js'));
 
 chai.use(chaiHttp);
 
