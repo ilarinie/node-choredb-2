@@ -89,9 +89,8 @@ describe('routes : integration', () => {
               var commune = contents.commune;
               var chores = contents.chores;
               var purchases = contents.purchases;
-              purchases.length.should.equal(1);
-              should.not.exist(purchases[0].amount);
-              should.not.exist(purchases[0].name);
+              purchases.length.should.equal(2);
+              purchases[1].amount.should.equal('1.99');
               commune.commune_id.should.equal(1);
               done();
           });

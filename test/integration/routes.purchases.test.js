@@ -47,7 +47,7 @@ describe('routes : chores', () => {
                 .send()
                 .end((err, res) => {
                   should.not.exist(err);
-                  res.body.message.should.equal("Purchase deleted succesfully.");
+                  res.body.message.should.equal("Purchase cancelled succesfully");
                   done();
                 });
           }

@@ -41,7 +41,7 @@ describe('routes : communes', () => {
         var commune = contents.commune;
         var chores = contents.chores;
         var purchases = contents.purchases;
-        purchases.length.should.equal(2);
+        purchases.length.should.equal(10);
         chores.length.should.equal(10);
         commune.commune_id.should.equal(1);
         done();

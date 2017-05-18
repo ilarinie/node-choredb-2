@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
       table.increments('purchase_id').primary();
       table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
       table.decimal('amount').notNullable();
+      table.boolean('cancelled').notNullable().defaultTo(false);
       table.string('description').notNullable();
       table.integer('commune_id').unsigned().references('commune_id').inTable('communes').onDelete('CASCADE');
       table.uuid('user_id').unsigned().references('user_id').inTable('users').onDelete('CASCADE');

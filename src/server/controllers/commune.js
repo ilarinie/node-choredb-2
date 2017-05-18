@@ -1,4 +1,5 @@
 const knex = require('../db/connection');
+const parsePurchases = require('./purchase');
 
 function findCommune(commune_id) {
     return knex('communes').where('commune_id', commune_id).first();
@@ -18,12 +19,21 @@ function findCommuneChores(commune_id) {
 }
 
 function findCommunePurchases(commune_id) {
-    return knex.raw('SELECT users.username, communes.commune_id, sum(amount) as amount, avg(amount) FROM purchases' +
+    return knex.raw('SELECT users.username, purchases.cancelled, purchases.purchase_id, purchases.amount, purchases.description, purchases.user_id, purchases.created_at' +
+                    ' FROM purchases' +
+                    ' LEFT JOIN users on users.user_id = purchases.user_id ' +
+                    ' WHERE users.commune_id = ' + commune_id +
+                    ' ORDER BY purchases.purchase_id DESC;').then((result) => {
+                      return result.rows;
+                    })
+
+
+    /*return knex.raw('SELECT users.username, communes.commune_id, sum(amount) as amount, avg(amount) FROM purchases' +
         ' RIGHT JOIN users on users.user_id = purchases.user_id' +
         ' RIGHT JOIN communes on communes.commune_id = users.commune_id' +
         ' WHERE communes.commune_id =' + commune_id + ' GROUP BY users.username, communes.commune_id;').then((result) => {
         return sortAndParsePurchases(result.rows)
-    });
+    });*/
 }
 
 
