@@ -14,6 +14,9 @@ function findCommuneChores(commune_id) {
                     ' WHERE communes.commune_id = '+ commune_id +
                     ' GROUP BY chores.chore_id, chores.name, users.username, chores.priority, chores.points ) foo' +
                     ' GROUP BY foo.username, foo.chore_id, foo.name, foo.priority, foo.points;').then((chores) => {
+                      if (!chores.rows[0].chore_id){
+                        return [];
+                      }
                       return chores.rows;
                   });
 }
@@ -22,8 +25,11 @@ function findCommunePurchases(commune_id) {
     return knex.raw('SELECT users.username, purchases.cancelled, purchases.purchase_id, purchases.amount, purchases.description, purchases.user_id, purchases.created_at' +
                     ' FROM purchases' +
                     ' LEFT JOIN users on users.user_id = purchases.user_id ' +
-                    ' WHERE users.commune_id = ' + commune_id +
+                    ' WHERE purchases.commune_id = ' + commune_id +
                     ' ORDER BY purchases.purchase_id DESC;').then((result) => {
+                      if (!result.rows[0].purchase_id){
+                        return [];
+                      }
                       return result.rows;
                     })
 
@@ -34,6 +40,16 @@ function findCommunePurchases(commune_id) {
         ' WHERE communes.commune_id =' + commune_id + ' GROUP BY users.username, communes.commune_id;').then((result) => {
         return sortAndParsePurchases(result.rows)
     });*/
+}
+
+function findCommuneTasks(commune_id) {
+  return knex.raw('SELECT users.username, chores.name, tasks.created_at, tasks.task_id, tasks.chore_id' +
+                  ' FROM chores' +
+                  ' LEFT JOIN tasks ON tasks.chore_id =chores.chore_id' +
+                  ' LEFT JOIN users ON tasks.user_id = users.user_id' +
+                  ' WHERE chores.commune_id = '+ commune_id + ';').then((result) => {
+                    return result.rows;
+                  })
 }
 
 
@@ -71,7 +87,11 @@ function getCommune(user, callBack) {
               resJson.chores = chores;
               findCommunePurchases(commune_id).then((purchases) => {
                   resJson.purchases = purchases;
-                  callBack(null, resJson);
+                  findCommuneTasks(commune_id).then((tasks) => {
+                    var newChores = addTasksToChores(resJson.chores, tasks);
+                    resJson.chores = newChores;
+                      callBack(null, resJson);
+                  })
               });
           });
       }).catch((err) => {
@@ -81,6 +101,25 @@ function getCommune(user, callBack) {
     } else {
         callBack(null, resJson);
     }
+}
+
+
+function addTasksToChores(chores, tasks){
+  var newChores = chores;
+  for (var i = 0; i < tasks.length; i++){
+    for (var j = 0; j < newChores.length; j++){
+        if (tasks[i].chore_id === newChores[j].chore_id){
+          if (newChores[j].tasks){
+            newChores[j].tasks.push(tasks[i]);
+          } else {
+            newChores[j].tasks = [];
+            newChores[j].tasks.push(tasks[i]);
+          }
+          //i += 999;
+        }
+    }
+  }
+  return chores;
 }
 
 
