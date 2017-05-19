@@ -27,9 +27,6 @@ function findCommunePurchases(commune_id) {
                     ' LEFT JOIN users on users.user_id = purchases.user_id ' +
                     ' WHERE purchases.commune_id = ' + commune_id +
                     ' ORDER BY purchases.purchase_id DESC;').then((result) => {
-                      if (!result.rows[0].purchase_id){
-                        return [];
-                      }
                       return result.rows;
                     })
 
