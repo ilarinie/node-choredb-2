@@ -37,7 +37,7 @@ describe('routes : communes', () => {
         should.not.exist(err);
         res.status.should.equal(200);
         res.type.should.equal('application/json');
-        var contents = JSON.parse(res.body.contents);
+        var contents = res.body.contents;
         var commune = contents.commune;
         var chores = contents.chores;
         var purchases = contents.purchases;

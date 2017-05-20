@@ -41,7 +41,7 @@ describe('routes : chores', () => {
                   .get('/communes')
                   .set('Authorization', tokens.commune_admin_token)
                   .end((err, res) => {
-                    var contents = JSON.parse(res.body.contents);
+                    var contents = res.body.contents;
                     var chores = contents.chores;
                     chores.length.should.equal(11);
                     done();
@@ -108,7 +108,7 @@ describe('routes : chores', () => {
                   .send()
                   .end((err, res) => {
                       should.not.exist(err);
-                      var chores = JSON.parse(res.body.contents);
+                      var chores = res.body.contents;
                       chores[0].tasks.length.should.equal(1)
                       chores[1].tasks.length.should.equal(0);
                       done();
@@ -135,7 +135,7 @@ describe('routes : chores', () => {
                 .send()
                 .end((err, res) => {
                     should.not.exist(err);
-                    var chores = JSON.parse(res.body.contents);
+                    var chores = res.body.contents;
                     chores.length.should.equal(10);
                     chores[0].tasks.length.should.equal(0);
                     done();

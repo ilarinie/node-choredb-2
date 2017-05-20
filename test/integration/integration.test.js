@@ -56,7 +56,7 @@ describe('routes : integration', () => {
         function getCommune() {
           chai.request(server).get('/communes').set('Authorization', token).send().end((err, res) => {
               should.not.exist(err);
-              var contents = JSON.parse(res.body.contents);
+              var contents = res.body.contents;
               var commune = contents.commune;
               var chores = contents.chores;
               var purchases = contents.purchases;
@@ -85,7 +85,7 @@ describe('routes : integration', () => {
         function getCommune2(){
           chai.request(server).get('/communes').set('Authorization', token).send().end((err, res) => {
               should.not.exist(err);
-              var contents = JSON.parse(res.body.contents);
+              var contents = res.body.contents;
               var commune = contents.commune;
               var chores = contents.chores;
               var purchases = contents.purchases;
