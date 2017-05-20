@@ -123,24 +123,23 @@ function addTasksToChores(chores, tasks){
       newChores[i].tasks = [];
     }
   }
-
   return newChores;
 }
 
 
 function postCommune(user, name, callBack) {
   if (user.commune_id){
-    callBack({message: "User already has a commune"}, null);
+    callBack("User already has a commune", null);
     return;
   }
   if (!name){
-    callBack({message: "No name given."}, null);
+    callBack("No name given.", null);
     return;
   }
   knex('communes').insert({name: name}).returning(['commune_id', 'name']).then((asd) => {
       var commune_id = asd[0].commune_id;
       knex.raw('UPDATE users SET commune_id = ' + commune_id + ', admin = true WHERE user_id = \'' + user.user_id + '\';').then(() => {
-          callBack(null, {message: "Commune created succesfully"});
+          callBack(null, "Commune created succesfully");
       });
   }).catch((err) => {
       callBack(err, null);

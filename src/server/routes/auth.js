@@ -20,6 +20,7 @@ router.post('/login', (req, res) => {
     if (req.body.username && req.body.password) {
         authHelpers.authenticate(res, req.body.username, req.body.password);
     } else {
+        console.log(req.body)
         handleError(res, 401, "You must provide valid credentials.");
     }
 
