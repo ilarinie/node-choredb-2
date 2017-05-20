@@ -39,7 +39,7 @@ router.delete('/:id', passport.authenticate('jwt', {session: false}), function(r
         if (purchase && !purchase.cancelled) {
           var cancelingPurchase = {};
           cancelingPurchase.amount = purchase.amount * -1;
-          cancelingPurchase.description = "Canceled: " + purchase.description;
+          cancelingPurchase.description = "Canceled: " + purchase.description + ' Original date: ' + purchase.created_at ;
           cancelingPurchase.user_id = purchase.user_id;
           cancelingPurchase.commune_id = purchase.commune_id;
           cancelingPurchase.cancelled = true;

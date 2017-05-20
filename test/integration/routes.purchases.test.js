@@ -63,7 +63,7 @@ describe('routes : chores', () => {
           .end((err, res) => {
             should.not.exist(err);
             res.body.message.should.equal("List of purchases provided.");
-            var purchases = JSON.parse(res.body.contents);
+            var purchases = res.body.contents;
             purchases.length.should.equal(10);
             done();
           })

@@ -41,8 +41,7 @@ describe('routes : chores', () => {
                   .get('/communes')
                   .set('Authorization', tokens.commune_admin_token)
                   .end((err, res) => {
-                    var contents = JSON.parse(res.body.contents);
-                    var commune = contents.commune;
+                    var contents = res.body.contents;
                     var chores = contents.chores;
                     chores.length.should.equal(11);
                     done();
@@ -62,7 +61,37 @@ describe('routes : chores', () => {
               should.exist(err);
               done();
             })
-      })
+      });
+      it('should delete an existing chore with a proper request', (done) => {
+          chai.request(server)
+              .delete('/chores/1')
+              .set('Authorization', tokens.commune_admin_token)
+              .send()
+              .end((err, res) => {
+                should.not.exist(err);
+                done();
+              })
+      });
+      it('should not delete a chore of another commune', (done) => {
+          chai.request(server)
+              .delete('/chores/20')
+              .set('Authorization', tokens.commune_admin_token)
+              .send()
+              .end((err,res) => {
+                should.exist(err);
+                done();
+              })
+      });
+      it('should not delete a chore if user is not an admin', (done) => {
+         chai.request(server)
+             .delete('/chores/1')
+             .set('Authorization', tokens.commune_user_token)
+             .send()
+             .end((err, res) => {
+                should.exist(err);
+                done();
+             })
+      });
     });
 
     describe('POST /chores/:id/do', () => {
@@ -73,10 +102,20 @@ describe('routes : chores', () => {
             .send()
             .end((err, res) => {
               should.not.exist(err);
-              done();
+              chai.request(server)
+                  .get('/chores')
+                  .set('Authorization', tokens.commune_admin_token)
+                  .send()
+                  .end((err, res) => {
+                      should.not.exist(err);
+                      var chores = res.body.contents;
+                      chores[0].tasks.length.should.equal(1)
+                      chores[1].tasks.length.should.equal(0);
+                      done();
+                  })
             })
       })
-      it('should fail with an impoper chore id', (done) => {
+      it('should fail with an improper chore id', (done) => {
         chai.request(server)
             .post('/chores/6/do')
             .set('Authorization', tokens.commune_admin_token)
@@ -87,6 +126,22 @@ describe('routes : chores', () => {
             })
       })
     });
+
+    describe('GET /chores', () => {
+        it('should receive a valid list of chores', (done) => {
+            chai.request(server)
+                .get('/chores')
+                .set('Authorization', tokens.commune_admin_token)
+                .send()
+                .end((err, res) => {
+                    should.not.exist(err);
+                    var chores = res.body.contents;
+                    chores.length.should.equal(10);
+                    chores[0].tasks.length.should.equal(0);
+                    done();
+                });
+        })
+    })
 
 
 

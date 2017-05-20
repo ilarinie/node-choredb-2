@@ -31,10 +31,21 @@ function authenticate(res, username, password) {
     var token = jwt.sign(payload, process.env.SECRET_KEY);
     responseJson = {};
     responseJson.message = "Succesfully authenticated";
-    responseJson.contents = {token: token};
+    responseJson.contents = {token: token, user: parseUser(user)};
     res.status(200).json( responseJson );
   });
 }
+
+
+function parseUser(user) {
+  let newUser = {};
+  newUser.user_id = user.user_id;
+  newUser.commune_id = user.commune_id;
+  newUser.username = user.username;
+  newUser.name = user.name;
+  return newUser;
+}
+
 
 
 function createUser (req) {
