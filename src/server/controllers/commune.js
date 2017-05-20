@@ -115,11 +115,16 @@ function addTasksToChores(chores, tasks){
             newChores[j].tasks = [];
             newChores[j].tasks.push(tasks[i]);
           }
-          //i += 999;
         }
     }
   }
-  return chores;
+  for (var i = 0; i < newChores.length; i++) {
+    if (!newChores[i].tasks){
+      newChores[i].tasks = [];
+    }
+  }
+
+  return newChores;
 }
 
 
