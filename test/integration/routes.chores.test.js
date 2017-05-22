@@ -38,11 +38,10 @@ describe('routes : chores', () => {
             .end((err, res) => {
               should.not.exist(err);
               chai.request(server)
-                  .get('/communes')
+                  .get('/chores')
                   .set('Authorization', tokens.commune_admin_token)
                   .end((err, res) => {
-                    var contents = res.body.contents;
-                    var chores = contents.chores;
+                    var chores = res.body.contents;
                     chores.length.should.equal(11);
                     done();
                   });

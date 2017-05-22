@@ -14,6 +14,12 @@ var payload_user_with_commune = {
 };
 const commune_user_token = "JWT " + jwt.sign(payload_user_with_commune, process.env.SECRET_KEY);
 
+var payload_user_with_commune_2 = {
+    id: 'd0f6c11a-9999-43ac-a309-e52d6c6e5271',
+    expiry: Math.floor(new Date().getTime() + 60 * 60 * 60 * 1000)//7*24*60*60;
+};
+const commune2_user_token = "JWT " + jwt.sign(payload_user_with_commune_2, process.env.SECRET_KEY);
+
 var payload_user_without_commune = {
   id: '51f84155-11e5-4511-92a7-4a9f8f37344e',
   expiry: Math.floor(new Date().getTime() + 60 * 60 * 60 * 1000)//7*24*60*60;
@@ -24,5 +30,8 @@ const user_without_commune_token = "JWT " + jwt.sign(payload_user_without_commun
 module.exports = {
   commune_admin_token,
   commune_user_token,
+  commune2_user_token,
   user_without_commune_token
 }
+
+

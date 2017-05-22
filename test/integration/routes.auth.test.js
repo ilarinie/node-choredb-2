@@ -132,10 +132,10 @@ describe('routes : auth', () => {
         });
     });
 
-    describe('POST /auth/change_password', () => {
+    describe('PUT /auth/change_password', () => {
       it('should be able to change password and login with the new pass', (done) => {
         chai.request(server)
-            .post('/auth/change_password')
+            .put('/auth/change_password')
             .set('Authorization', tokens.commune_admin_token)
             .send({
               password: '1111'
