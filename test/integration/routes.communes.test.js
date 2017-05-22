@@ -37,13 +37,8 @@ describe('routes : communes', () => {
         should.not.exist(err);
         res.status.should.equal(200);
         res.type.should.equal('application/json');
-        var contents = res.body.contents;
-        var commune = contents.commune;
-        var chores = contents.chores;
-        var purchases = contents.purchases;
-        purchases.length.should.equal(10);
-        chores.length.should.equal(10);
-        commune.commune_id.should.equal(1);
+        var commune = res.body.contents;
+        commune.name.should.equal('test_commune_1');
         done();
       });
     });

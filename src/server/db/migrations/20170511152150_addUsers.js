@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
         table.string('password').notNullable();
         table.boolean('admin').defaultTo(false);
         table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
-        table.integer('commune_id').unsigned().references('commune_id').inTable('communes').onDelete('CASCADE');
+        table.integer('commune_id').unsigned().references('commune_id').inTable('communes');
     });
 };
 

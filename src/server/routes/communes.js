@@ -7,13 +7,13 @@ const knex = require('../db/connection');
 const communeController = require('../controllers/commune');
 
 router.get('/', passport.authenticate('jwt', {session: false}), function(req, res, next) {
-    communeController.getCommune(req.user, (err, results) => {
-      if (!err){
-        responder.handleResponse(res, 200, "Success", results);
-      } else {
-        responder.handleError(res, 500, err.toString());
-      }
-    });
+    knex('communes').where('commune_id', req.user.commune_id).first().then((commune) => {
+        if (commune){
+            responder.handleResponse(res, 200, "Success.", commune);
+        } else {
+            responder.handleError(res, 406, "Commune not found");
+        }
+    })
 });
 
 router.post('/', passport.authenticate('jwt', {session: false}), function(req, res, next) {
@@ -26,6 +26,10 @@ router.post('/', passport.authenticate('jwt', {session: false}), function(req, r
       }
     })
 });
+
+
+
+
 
 router.post('/add_user', passport.authenticate('jwt', {session: false}), function(req, res) {
     var user_id = req.user.user_id;

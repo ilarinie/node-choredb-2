@@ -56,16 +56,28 @@ describe('routes : integration', () => {
         function getCommune() {
           chai.request(server).get('/communes').set('Authorization', token).send().end((err, res) => {
               should.not.exist(err);
-              var contents = res.body.contents;
-              var commune = contents.commune;
-              var chores = contents.chores;
-              var purchases = contents.purchases;
-              purchases.length.should.equal(1);
-              purchases[0].amount.should.eql('1.99');
-              chores.length.should.equal(1);
+              var commune = res.body.contents;
               commune.commune_id.should.equal(1);
-              deleteChore();
+              getChores();
           });
+        }
+
+        function getChores() {
+            chai.request(server).get('/chores').set('Authorization', token).send().end((err, res) => {
+                should.not.exist(err);
+                var chores = res.body.contents;
+                chores.length.should.equal(1);
+                getPurchases();
+            });
+        }
+
+        function getPurchases() {
+            chai.request(server).get('/purchases').set('Authorization', token).send().end((err, res) => {
+                should.not.exist(err);
+                var purchases = res.body.contents;
+                purchases.length.should.equal(1);
+                deleteChore();
+            });
         }
 
         function deleteChore() {
@@ -78,22 +90,26 @@ describe('routes : integration', () => {
         function deletePurchase() {
           chai.request(server).delete('/purchases/1').set('Authorization', token).send().end((err, res) => {
               should.not.exist(err);
-              getCommune2();
+              getChores2();
           });
         }
 
-        function getCommune2(){
-          chai.request(server).get('/communes').set('Authorization', token).send().end((err, res) => {
+        function getChores2(){
+          chai.request(server).get('/chores').set('Authorization', token).send().end((err, res) => {
               should.not.exist(err);
-              var contents = res.body.contents;
-              var commune = contents.commune;
-              var chores = contents.chores;
-              var purchases = contents.purchases;
-              purchases.length.should.equal(2);
-              purchases[1].amount.should.equal('1.99');
-              commune.commune_id.should.equal(1);
-              done();
+              var chores = res.body.contents;
+              chores.length.should.equal(0);
+              getPurchases2();
           });
+        }
+
+        function getPurchases2(){
+            chai.request(server).get('/purchases').set('Authorization', token).send().end((err, res) => {
+                should.not.exist(err);
+                var purchases = res.body.contents;
+                purchases.length.should.equal(2);
+                done();
+            });
         }
 
     });

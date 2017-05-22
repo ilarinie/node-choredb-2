@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../auth/jwt');
 const knex = require('../db/connection');
-
 var responder = require('./responder');
-var parsePurchases = require('../controllers/purchase');
 
 router.post('/', passport.authenticate('jwt', {session: false}), function(req, res) {
     var user_id = req.user.user_id;

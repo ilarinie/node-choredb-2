@@ -11,13 +11,12 @@ router.get('/', passport.authenticate('jwt', {session: false}), function(req, re
             // Fetch tasks corresponding to the chores
             knex.raw('SELECT users.username, chores.name, tasks.created_at, tasks.task_id, tasks.chore_id' +
                 ' FROM chores' +
-                ' LEFT JOIN tasks ON tasks.chore_id =chores.chore_id' +
+                ' LEFT JOIN tasks ON tasks.chore_id = chores.chore_id' +
                 ' LEFT JOIN users ON tasks.user_id = users.user_id' +
                 ' WHERE chores.commune_id = '+ req.user.commune_id +
                 ' ORDER BY tasks.created_at DESC;').then((result) => {
                 responder.handleResponse(res, 200, "Chores and tasks provided", addTasksToChores(chores, result.rows));
             }).catch((err) => {
-                console.log(err)
                 responder.handleError(res, 500, "Something went wrong when getting chores and tasks.");
             });
         }).catch((err) => {

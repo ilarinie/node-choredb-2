@@ -64,10 +64,31 @@ function createUser (req) {
 function changePassword(req, res, password) {
   const salt = bcrypt.genSaltSync();
   const hash = bcrypt.hashSync(password, salt);
+  return knex('users').where('user_id', req.user.user_id).update({password: hash}).then((result) => {
+    if (result === 1){
+      res.status(200).json({message: "Password changed succesfully"});
+    }
+  })
+}
 
-  return knex('users').update({
-    password: hash
-  }).returning('*');
+function removeUser(req, res, user_id) {
+  knex('users').where('user_id', user_id).first().then((user) => {
+    if (user) {
+        if (user.commune_id == req.user.commune_id && req.user.admin){
+            knex.raw("UPDATE users SET commune_id = NULL where user_id = '" + user_id + "';").then((results) => {
+              if (results.rowCount === 1) {
+                res.status(200).json({message: "User removed from commune."});
+              } else {
+                res.status(500).json({message: "Something went wrong"});
+              }
+            })
+        } else {
+          res.status(406).json({message: "You are not authorized to do that."});
+        }
+    } else {
+      res.status(404).json({message: "User not found."});
+    }
+  });
 }
 
 module.exports = {
@@ -75,5 +96,6 @@ module.exports = {
   loginRequired,
   authenticate,
   changePassword,
+  removeUser,
   createUser
 };
