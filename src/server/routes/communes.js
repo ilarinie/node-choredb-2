@@ -22,8 +22,19 @@ router.post('/', passport.authenticate('jwt', {session: false}), function(req, r
       if (!err) {
         responder.handleResponse(res, 200, "Success", results);
       } else {
-        responder.handleError(res, 406, err.toString());
+        responder.handleError(res, 406, err);
       }
+    })
+});
+
+router.put('/', passport.authenticate('jwt', {session: false}), function(req, res, next) {
+    var user = req.user;
+    communeController.updateCommune(req.user.commune_id, req.body, (err, results) => {
+        if (!err) {
+            responder.handleResponse(res, 200, "Success", results);
+        } else {
+            responder.handleError(res, 406, err);
+        }
     })
 });
 

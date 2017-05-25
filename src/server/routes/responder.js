@@ -6,7 +6,7 @@ function handleResponse(response, statusCode, message, contents) {
 }
 
 function handleError(response, statusCode, message) {
-    response.status(statusCode).json({ message: message.toString(), statusCode: statusCode });
+    response.status(statusCode).json({ message: message });
 }
 
 module.exports = {

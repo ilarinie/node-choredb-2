@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../auth/jwt');
 const knex = require('../db/connection');
+const telegramBot = require('../telegram');
+
 var responder = require('./responder');
 
 router.post('/', passport.authenticate('jwt', {session: false}), function(req, res) {
@@ -15,8 +17,9 @@ router.post('/', passport.authenticate('jwt', {session: false}), function(req, r
         purchase.amount = amount;
         purchase.user_id = user_id;
         purchase.commune_id = commune_id;
-        if (validatePurchase(purchase)) {
+        if (validatePurchase(purchase) === '') {
           knex('purchases').insert(purchase).then((result) => {
+            telegramBot.sendMessage(commune_id, req.user.username + ' just bought ' + purchase.description + ', costing ' + purchase.amount +' dollarooneys.');
             responder.handleResponse(res, 200, "Purchase created.", purchase);
           });
         } else {
@@ -43,6 +46,7 @@ router.delete('/:id', passport.authenticate('jwt', {session: false}), function(r
           cancelingPurchase.cancelled = true;
           knex('purchases').insert(cancelingPurchase).then((result) => {
             knex('purchases').where('purchase_id', purchase.purchase_id).update({cancelled: true}).then((result) => {
+              telegramBot.sendMessage(req.user.commune_id, req.user.username + ' cancelled a previous purchase: ' + cancelingPurchase.description + '. Amount was ' + purchase.amount);
               responder.handleResponse(res, 200, "Purchase cancelled succesfully");
             })
           }).catch((err) => {
@@ -68,7 +72,6 @@ router.get('/', passport.authenticate('jwt', {session: false}), function(req, re
                     ' ORDER BY purchases.purchase_id DESC;').then((result) => {
                       responder.handleResponse(res, 200, "List of purchases provided.", result.rows);
                     }).catch((err) => {
-                      console.log(err);
                       responder.handleError(res, 500, "Database error");
                     })
 
@@ -82,7 +85,7 @@ router.get('/', passport.authenticate('jwt', {session: false}), function(req, re
 
 
 validatePurchase = (purchase) => {
-  if (!purchase.amount || isNaN(parseDouble(purchase.amount)) ){
+  if (!purchase.amount || isNaN(parseFloat(purchase.amount)) ){
     return "Purchase is missing a proper amount.";
   }
   if (purchase.amount < 0){
@@ -91,7 +94,7 @@ validatePurchase = (purchase) => {
   if (purchase.amount > 99999 ){
     return "Purchase amount too high.";
   }
-  if (!purchase.description || purchase.description.length > 100 || purchase.descripion.length < 2){
+  if (!purchase.description || purchase.description.length > 100 || purchase.description.length < 2){
     return "Purchase description missing or too long.";
   }
   if (!purchase.user_id){
@@ -100,7 +103,7 @@ validatePurchase = (purchase) => {
   if (!purchase.commune_id) {
     return "Commune ID missing.";
   }
-  return true;
+  return '';
 }
 
 

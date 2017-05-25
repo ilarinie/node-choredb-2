@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require('../auth/jwt');
 const responder = require('./responder');
 const knex = require('../db/connection');
-
+const telegramBot = require('../telegram');
 
 router.get('/', passport.authenticate('jwt', {session: false}), function(req, res) {
     if(validRequest(req, false )){
@@ -34,6 +34,7 @@ router.post('/:id/do', passport.authenticate('jwt', {session: false}), function(
             var chore_id = chore.chore_id;
             if (chore.commune_id === req.user.commune_id) {
                 knex('tasks').insert({user_id: req.user.user_id, chore_id: chore_id}).then((task) => {
+                    telegramBot.sendMessage(req.user.commune_id, req.user.username + ' just completed ' + chore.name + '. Nicely done.');
                     responder.handleResponse(res, 200, "Completion saved succesfully.");
                 });
             } else {
@@ -50,16 +51,17 @@ router.post('/:id/do', passport.authenticate('jwt', {session: false}), function(
 router.post('/', passport.authenticate('jwt', {session: false}), function(req, res) {
     if (validRequest(req, true)) {
         var chore = parseChoreFromReq(req);
-        if (chore && validateChore(chore)) {
+        if (validateChore(chore) === '') {
                 chore.creator_id = req.user.user_id;
                 chore.commune_id = req.user.commune_id;
-                knex('chores').returning('*').insert(chore).then((chore) => {
-                    responder.handleResponse(res, 200, "New chore created succesfully", chore);
+                knex('chores').returning('*').insert(chore).then((newChore) => {
+                    telegramBot.sendMessage(req.user.commune_id, req.user.username + ' just created a new chore called ' + newChore[0].name);
+                    responder.handleResponse(res, 200, "New chore created succesfully", newChore[0]);
                 }).catch((err) => {
                     responder.handleError(res, 500, "Internal server error :(");
                 });
         } else {
-            responder.handleError(res, 400, "Invalid chore.");
+            responder.handleError(res, 400, validateChore(chore));
         }
     } else {
         responder.handleError(res, 400, "Bad request");
@@ -70,20 +72,22 @@ router.put('/:id', passport.authenticate('jwt', {session: false}), function(req,
     var id = parseInt(req.params.id)
    if (validRequest(req, true), id){
     var chore = parseChoreFromReq(req);
-    if (chore && validateChore(chore)) {
+    if (validateChore(chore, false) === '') {
         knex('chores').where('chore_id', id).first().then((oldChore) => {
             if (oldChore.commune_id === req.user.commune_id) {
                 knex('chores').returning('*').where('chore_id', id).update(chore).then((results) => {
-                   responder.handleResponse(res, 200, "Chore updated succesfully.", results)
+                   responder.handleResponse(res, 200, "Chore updated successfully.", results)
                 })
             } else {
-                responder.handleError(res, 400, "Trying to update someone elses chores, are we?");
+                responder.handleError(res, 400, "Trying to update someone else's chores, are we?");
             }
         })
 
+    } else {
+        responder.handleError(res, 406, validateChore(chore));
     }
    } else {
-       responder.handleError(res, 400, "Bad Request");
+       responder.handleError(res, 400, "Invalid request");
    }
 
 });
@@ -95,6 +99,7 @@ router.delete('/:id', passport.authenticate('jwt', {session: false}), function(r
     knex('chores').where('commune_id', req.user.commune_id).andWhere('chore_id', chore_id).first().del()
       .then((result) => {
         if (result === 1) {
+          telegramBot.sendMessage(req.user.commune_id, req.user.username + ' just deleted a chore.');
           responder.handleResponse(res, 200, "Chore deleted succesfully.");
         } else {
           responder.handleError(res, 404, "Chore not found.");
@@ -125,41 +130,36 @@ parseChoreFromReq = (req) => {
     return chore;
 }
 
-validateChore = (chore) => {
-    let errors = [];
-    if (!chore.name) {
-        errors.push("Name is mandatory and missing.\n");
+validateChore = (chore, checkForName) => {
+    chore = sanitizeChore(chore);
+    if (!chore.name && checkForName) {
+        return "Name is mandatory and missing.";
     } else {
         if (chore.name.length > 50){
-            errors.push("Name is too long (max 50 letters)\n");
+            return "Name is too long (max 50 letters)";
         }
         if (chore.name.length < 2) {
-            errors.push("Name too short (minimum 2 letters)\n");
+            return "Name too short (minimum 2 letters)";
         }
     }
     if (chore.priority ){
         if (chore.priority < 0){
-            errors.push("Priority cant be negative\n");
+            return "Priority cant be negative";
         }
         if (chore.priority > 90000) {
-            errors.push("Priority cant be over 90000\n");
+            return "Priority cant be over 90000";
         }
     }
     if (chore.points){
         if (chore.points < 0){
-            errors.push("Points cant be negative\n");
+            return "Points cant be negative";
         }
         if (chore.points > 90000) {
-            errors.push("Points cant be over 90000\n");
+            return "Points cant be over 90000";
         }
     }
-    if (errors.length === 0){
-        chore = sanitizeChore(chore);
-        return true;
-    } else {
-        chore.errors = errors;
-        return false;
-    }
+
+    return '';
 }
 
 sanitizeChore = (chore) => {
@@ -172,6 +172,9 @@ sanitizeChore = (chore) => {
     }
     if (chore.points) {
         newChore.points = chore.points;
+    }
+    if (chore.name) {
+        newChore.name = chore.name;
     }
     return newChore;
 }

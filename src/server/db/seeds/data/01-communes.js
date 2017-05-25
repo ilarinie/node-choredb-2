@@ -14,6 +14,7 @@ exports.seed = (knex, Promise) => {
 
 function createCommune(knex, name){
   return knex.table('communes').insert({
-    name: name
+    name: name,
+    telegram_channel_id: '@lehmatesti'
   });
 }
