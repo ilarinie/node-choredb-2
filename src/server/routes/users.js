@@ -38,7 +38,7 @@ router.delete('/:user_id', passport.authenticate('jwt', {session: false}), funct
         authHelpers.removeUser(req, res, id);
     } else {
         responder.handleError(res, 406, "Unauthorized request.");
-    }
+    } q
 });
 
 router.put('/', passport.authenticate('jwt', {session: false}), function(req, res) {
