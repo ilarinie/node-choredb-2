@@ -10,8 +10,10 @@ router.get('/', passport.authenticate('jwt', {session: false}), function(req, re
     knex.select('username', 'name', 'user_id', 'admin').from('users').where('commune_id', req.user.commune_id).then((users) => {
         knex.select('task_id', 'user_id', 'tasks.created_at', 'tasks.chore_id', 'name').from('tasks').leftJoin('chores', 'chores.chore_id', 'tasks.chore_id').where('commune_id', req.user.commune_id).orderBy('tasks.created_at', 'DESC').then((tasks) => {
             knex.select('description', 'purchase_id', 'amount','created_at', 'user_id').from('purchases').where('commune_id', req.user.commune_id).orderBy('created_at', 'DESC').then((purchases) => {
-                var responseObject = addPurchasesAndTasksToUsers(tasks, purchases, users);
-                responder.handleResponse(res, 200, "User list provided.", responseObject);
+                knex.raw("SELECT tasks.user_id, sum(points) as points FROM tasks LEFT JOIN chores ON chores.chore_id = tasks.chore_id WHERE chores.commune_id=" + req.user.commune_id + " GROUP BY tasks.user_id").then((points) => {
+                    var usersJSON = addPurchasesAndTasksAndPointsToUsers(tasks, purchases,points.rows,  users);
+                    responder.handleResponse(res, 200, "User list provided.", usersJSON);
+                } )
             })
         });
     });
@@ -38,7 +40,7 @@ router.delete('/:user_id', passport.authenticate('jwt', {session: false}), funct
         authHelpers.removeUser(req, res, id);
     } else {
         responder.handleError(res, 406, "Unauthorized request.");
-    } q
+    }
 });
 
 router.put('/', passport.authenticate('jwt', {session: false}), function(req, res) {
@@ -64,30 +66,37 @@ router.put('/', passport.authenticate('jwt', {session: false}), function(req, re
 });
 
 
-addPurchasesAndTasksToUsers = (tasks, purchases, users) => {
-    for (let i = 0; i < tasks.length; i++){
-        for (let j = 0; j < users.length; j++){
-            users[j].tasks ? "" : users[j].tasks = [] ;
-            if (tasks[i].user_id === users[j].user_id){
-                users[j].tasks.push(tasks[i]);
-                j+=100;
+addPurchasesAndTasksAndPointsToUsers = (tasks, purchases, points,  users) => {
+    let newTasks = tasks;
+    let newPurchases = purchases;
+    let newPoints = points;
+    let newUsers = users;
+
+    for (let i = 0 ; i < newUsers.length ; i++){
+        newUsers[i].tasks = [];
+        newUsers[i].purchases = [];
+        newUsers[i].points = 0;
+        for (let t = 0; t < newTasks.length; t++) {
+            if (newTasks[t].user_id === newUsers[i].user_id){
+                newUsers[i].tasks.push(newTasks[t]);
+                newTasks.splice(t, 1);
             }
         }
-    }
-    for (let i = 0; i < purchases.length; i++){
-        for (let j = 0; j < users.length; j++){
-            users[j].purchases ? "" : users[j].purchases = [] ;
-            if (purchases[i].user_id === users[j].user_id){
-                users[j].purchases.push(purchases[i]);
-                j+=100;
+        for (let p = 0; p < newPurchases.length; p++) {
+            if (newPurchases[p].user_id === newUsers[i].user_id){
+                newUsers[i].purchases.push(newPurchases[p]);
+                newPurchases.splice(p, 1);
             }
         }
+        for (let po = 0; po < newPoints.length; po++) {
+            if (newPoints[po].user_id === newUsers[i].user_id){
+                newUsers[i].points = newPoints[po].points;
+                newPoints.splice(po,1);
+            }
+
+        }
     }
-    for (let i = 0; i < users.length; i++){
-        users[i].tasks ? "" : users[i].tasks = [];
-        users[i].purchases ? "" : users[i].purchases = [];
-    }
-    return users;
+    return newUsers;
 }
 
 

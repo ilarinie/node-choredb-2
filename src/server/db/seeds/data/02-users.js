@@ -41,7 +41,7 @@ function createSpecialUsers() {
 specialUsers.push(user_with_admin);
   var user_normal = { username: "user_normal", commune_id: 1, password: hash, admin: false, user_id: 'd0f6c11a-826f-43ac-a309-e52d6c6e5271'}
 specialUsers.push(user_normal);
-    user_normal = { username: "user_normal_commune_2", commune_id: 2, password: hash, admin: false, user_id: 'd0f6c11a-9999-43ac-a309-e52d6c6e5271'}
+    user_normal = { username: "user_normal_commune_2", commune_id: 2, password: hash, admin: false, user_id: '39924a9e-640f-4245-bfb9-e5cb2de5b049'}
     specialUsers.push(user_normal);
   return specialUsers;
 }

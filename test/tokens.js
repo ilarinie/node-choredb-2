@@ -15,7 +15,7 @@ var payload_user_with_commune = {
 const commune_user_token = "JWT " + jwt.sign(payload_user_with_commune, process.env.SECRET_KEY);
 
 var payload_user_with_commune_2 = {
-    id: 'd0f6c11a-9999-43ac-a309-e52d6c6e5271',
+    id: '39924a9e-640f-4245-bfb9-e5cb2de5b049',
     expiry: Math.floor(new Date().getTime() + 60 * 60 * 60 * 1000)//7*24*60*60;
 };
 const commune2_user_token = "JWT " + jwt.sign(payload_user_with_commune_2, process.env.SECRET_KEY);

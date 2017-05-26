@@ -198,6 +198,10 @@ function addTasksToChores(chores, tasks){
             newChores[i].tasks = [];
         }
     }
+
+    newChores.sort((a,b ) => {
+        return a.chore_id - b.chore_id;
+    })
     return newChores;
 }
 
